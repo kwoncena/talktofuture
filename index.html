@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TALK - EOE</title>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Send Your Voice to the Future</h1>
+        <div class="buttons">
+          <button id="recordButton">Record</button>
+          <button id="stopButton" disabled>Stop Recording</button>
+        </div>
+        <p id="statusText">Ready to record</p>
+        <div id="emailOptions" style="display: none;">
+          <label for="email">Enter your email:</label>
+          <input type="email" id="email" placeholder="example@domain.com">
+    
+          <label for="time">Send in:</label>
+          <select id="time">
+            <option value="5m">5 minutes</option>
+            <option value="5y">5 years</option>
+            <option value="10y">10 years</option>
+            <option value="15y">15 years</option>
+            <option value="25y">25 years</option>
+            <option value="50y">50 years</option>
+            <option value="75y">75 years</option>
+          </select>
+    
+          <button id="sendButton" disabled>Send</button>
+        </div>
+        <div id="visualContainer">
+          <!-- SVG container for D3 visuals -->
+        </div>
+      </div>
+      <script src="talk.js"></script>
+</body>
+</html>
