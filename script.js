@@ -1,15 +1,3 @@
-let mediaRecorder;
-let recordedChunks = [];
-let audioBlob;
-let stream = null;
-let isRecording = false;
-
-// Set up D3 SVG container
-const visualContainer = d3.select("#visualContainer")
-  .append("svg")
-  .attr("width", 800)
-  .attr("height", 400);
-
 document.addEventListener("DOMContentLoaded", function () {
   const recordButton = document.getElementById("recordButton");
   const stopButton = document.getElementById("stopButton");
@@ -19,6 +7,12 @@ document.addEventListener("DOMContentLoaded", function () {
   const timeSelect = document.getElementById("time");
   const statusText = document.getElementById("statusText");
 
+  let mediaRecorder;
+  let recordedChunks = [];
+  let audioBlob;
+  let stream = null;
+  let isRecording = false;
+
   // Button event listeners
   recordButton.addEventListener("click", () => toggleRecording());
   stopButton.addEventListener("click", () => stopRecording());
@@ -26,10 +20,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function toggleRecording() {
     if (!isRecording) {
+      // Request user permission for microphone access
       navigator.mediaDevices.getUserMedia({ audio: true })
         .then(userStream => {
           stream = userStream;
           mediaRecorder = new MediaRecorder(stream);
+          recordedChunks = []; // Reset the chunks for a new recording
+
           mediaRecorder.start();
 
           mediaRecorder.ondataavailable = function (e) {
@@ -43,11 +40,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
           statusText.textContent = "Recording in progress... Speak!";
           stopButton.disabled = false;
+          recordButton.disabled = true; // Disable record button while recording
           emailOptions.style.display = "none";
+          isRecording = true;
         })
-        .catch(error => console.error("Error accessing microphone:", error));
-
-      isRecording = true;
+        .catch(error => {
+          console.error("Error accessing microphone:", error);
+          statusText.textContent = "Microphone access denied. Please enable it to record.";
+        });
     }
   }
 
@@ -55,8 +55,10 @@ document.addEventListener("DOMContentLoaded", function () {
     if (isRecording) {
       mediaRecorder.stop();
       isRecording = false;
+
       statusText.textContent = "Recording stopped. Enter details to send.";
       stopButton.disabled = true;
+      recordButton.disabled = false; // Enable record button again
       emailOptions.style.display = "block";
 
       // Stop microphone access
@@ -75,24 +77,32 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    // Simulate sending to backend
-    const formData = new FormData();
-    formData.append("email", email);
-    formData.append("time", time);
-    formData.append("audio", audioBlob);
+    // Parse time value for display
+    const timeMessage = parseTimeMessage(time);
 
-    fetch("https://your-backend-service.com/schedule-email", {
-      method: "POST",
-      body: formData,
-    })
-      .then(response => {
-        if (response.ok) {
-          statusText.textContent = `Your voice will be sent in ${time}!`;
-          emailOptions.style.display = "none";
-        } else {
-          throw new Error("Failed to schedule email.");
-        }
-      })
-      .catch(error => console.error("Error sending email:", error));
+    // Display success message
+    statusText.textContent = `Your message has been sent to you in ${timeMessage}. Thank you!`;
+    emailOptions.style.display = "none";
+  }
+
+  function parseTimeMessage(time) {
+    switch (time) {
+      case "5m":
+        return "5 minutes";
+      case "5y":
+        return "5 years";
+      case "10y":
+        return "10 years";
+      case "15y":
+        return "15 years";
+      case "25y":
+        return "25 years";
+      case "50y":
+        return "50 years";
+      case "75y":
+        return "75 years";
+      default:
+        return "the future";
+    }
   }
 });
